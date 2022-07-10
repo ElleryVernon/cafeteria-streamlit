@@ -1,4 +1,5 @@
 import streamlit as st
+import matplotlib.pyplot as plt
 import pandas as pd
 
 
@@ -55,19 +56,23 @@ def fetch_data(base_path=BASE_PATH, gdrive_id=GDRIVE_ID, file_name=FILE_NAME, ur
     st.write("""### 2. 데이터 로드하기""")
     st.write("""데이터를 다운해왔으니 판다스를 이용하여 데이터를 로드해보겠습니다. 데이터를 로드하는 간단한 함수도 하나 만들겠습니다.""")
     st.write("""다음은 **train.csv**와 **test.csv** 를 읽어들여 2개의 데이터프레임 객체를 반환하는 함수입니다.""")
+
     code = """def load_data(base_path=BASE_PATH):
     train_path=os.path.join(base_path, "train.csv")
     test_path=os.path.join(base_path, "test.csv")
     return pd.read_csv(train_path), pd.read_csv(test_path)"""
     st.code(code, language="python")
+
     st.write("""---""")
 
     st.write("""### 3. 데이터 구조 살펴보기""")
     st.write("""DataFrame의 head() 메서드를 사용하여 train, test의 첫 5개 레코드를 확인해보겠습니다.""")
+
     code = """
     train, test = load_data()\ndisplay(train.head()), display(test.head())
     """
     st.code(code, language="python")
+
     st.write("""""")
 
     col1, col2 = st.columns(2)
@@ -88,7 +93,11 @@ def fetch_data(base_path=BASE_PATH, gdrive_id=GDRIVE_ID, file_name=FILE_NAME, ur
     """
     )
     st.write("""---""")
+
     st.write("""#### 3.1 결측치 및 데이터 타입""")
+    st.write(
+        """우리가 분석할 데이터의 결측치 및 데이터 타입을 확인하기 위해 해당하는 내용들을 데이터프레임으로 만들어서 반환해주는 `draw_missing_values_table` 함수를 작성하겠습니다."""
+    )
     code = """def draw_missing_values_table(df):
     total = df.isnull().sum().sort_values(ascending=False)
     percent = total / len(df) * 100
@@ -98,6 +107,8 @@ def fetch_data(base_path=BASE_PATH, gdrive_id=GDRIVE_ID, file_name=FILE_NAME, ur
     )
     return df_missing"""
     st.code(code, language="python")
+    st.write("""""")
+    st.write("""* **실행결과**""")
     col3, col4 = st.columns(2)
     with col3:
         st.write("`train 데이터에는 결측치가 없어보입니다.`")
@@ -105,3 +116,50 @@ def fetch_data(base_path=BASE_PATH, gdrive_id=GDRIVE_ID, file_name=FILE_NAME, ur
     with col4:
         st.write("`test 데이터에는 결측치가 없어보입니다.`")
         st.dataframe(draw_missing_values_table(test).astype(str))
+    st.write(
+        """데이터셋에 결측치는 딱히 없어보입니다. `일자`, `요일`, `조식메뉴`, `중식메뉴`, `석식메뉴`는 데이터 타입이 `object`로 되어있습니다. 물론 파이썬의 모든 객체 중 하나가 될 수도 있지만, CSV 파일에서 읽어온 데이터이기 때문에 텍스트 데이터일 것으로 보입니다."""
+    )
+    st.write("""---""")
+
+    st.write("""#### 3.2 요약 정보 확인하기""")
+    st.write("""모든 필드를 살펴보도록 하겠습니다.`describe` 메서드는 숫자형 특성의 요약 정보를 출력해줍니다.""")
+    st.write("""""")
+    code = """train.describe(), test.describe()"""
+    st.code(code, language="python")
+    st.write("""""")
+    col5, col6 = st.columns(2)
+    with col5:
+        st.write("`train 데이터 요약 정보`")
+        st.dataframe(train.describe().T)
+    with col6:
+        st.write("`test 데이터 요약 정보`")
+        st.dataframe(test.describe().T)
+    st.write("""""")
+    st.write(
+        """`count`, `mean`, `min`, `max` 컬럼이 가지고 있는 데이터들은 이름 그대로의 의미를 가지고 있습니다 (결측치는 자동적으로 제외됩니다.). `std` 컬럼은 값이 퍼져있는 정도를 알려주는 표준편차를 의미합니다. `25%`, `50%`, `75%` 컬럼은 백분위수([Percentile](https://en.wikipedia.org/wiki/Percentile))를 의미합니다."""
+    )
+    st.write("""---""")
+
+    st.write("""#### 3.3 수치형 데이터 그래프로 확인하기""")
+
+    st.write(
+        """데이터셋을 빠르게 살펴보는 또 다른 방법은 수치형 데이터들을 그래프로 그려보는 것입니다. `hist` 메서드는 수치형 데이터들을 그래프로 그려줍니다."""
+    )
+    st.write("""""")
+    code = """train.hist(bins=50, figsize=(12, 8))\nplt.suptitle("Train 데이터 히스토그램")\nst.pyplot(plt.show())
+\n\ntest.hist(bins=50, figsize=(12, 8))\nplt.suptitle("test 데이터 히스토그램")\nst.pyplot(plt.show()))"""
+    st.code(code, language="python")
+    st.write("""""")
+    col7, col8 = st.columns(2)
+    with col7:
+        train.hist(bins=50, figsize=(12, 8))
+        plt.suptitle("Train 데이터 히스토그램")
+        st.pyplot(plt.show())
+    with col8:
+        test.hist(bins=50, figsize=(12, 8))
+        plt.suptitle("test 데이터 히스토그램")
+        st.pyplot(plt.show())
+
+    st.write("""""")
+    st.write("""우리는 방금 그려본 히스토그램에서 다음과 같은 사실들을 살펴볼 수 있습니다.""")
+    st.write("""1. 우선 모든 데이터가 따로 스케일이 되어 있지 않았음을 추측해볼 수 있습니다.""")

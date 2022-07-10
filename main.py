@@ -10,6 +10,7 @@ import gdown
 import app1
 import app2
 
+st.set_option("deprecation.showPyplotGlobalUse", False)
 
 BASE_PATH = "data/cafeteria"
 FILE_NAME = "cafeteria.zip"
