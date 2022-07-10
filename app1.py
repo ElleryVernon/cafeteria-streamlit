@@ -146,8 +146,8 @@ def fetch_data(base_path=BASE_PATH, gdrive_id=GDRIVE_ID, file_name=FILE_NAME, ur
         """데이터셋을 빠르게 살펴보는 또 다른 방법은 수치형 데이터들을 그래프로 그려보는 것입니다. `hist` 메서드는 수치형 데이터들을 그래프로 그려줍니다."""
     )
     st.write("""""")
-    code = """train.hist(bins=50, figsize=(12, 8))\nplt.suptitle("Train 데이터 히스토그램")\nst.pyplot(plt.show())
-\n\ntest.hist(bins=50, figsize=(12, 8))\nplt.suptitle("test 데이터 히스토그램")\nst.pyplot(plt.show()))"""
+    code = """train.hist(bins=50, figsize=(12, 8))\nplt.suptitle("Train 데이터 히스토그램")\nplt.show()
+\n\ntest.hist(bins=50, figsize=(12, 8))\nplt.suptitle("test 데이터 히스토그램")\nplt.show()"""
     st.code(code, language="python")
     st.write("""""")
     col7, col8 = st.columns(2)
